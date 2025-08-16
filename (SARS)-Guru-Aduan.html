@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peti Masuk Aduan</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-text: #1e293b;
+            --secondary-text: #475569;
+            --accent-color: #a4193d;
+            --shadow-color: rgba(100, 116, 139, 0.1);
+            --border-color: #e2e8f0;
+            --success-color: #22c55e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-color);
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+        .main-container {
+            max-width: 900px;
+            margin: 20px auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn-back {
+            font-size: 24px;
+            color: var(--secondary-text);
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .btn-back:hover {
+            color: var(--primary-text);
+            transform: scale(1.1);
+        }
+        h1 {
+            color: var(--primary-text);
+            font-size: 28px;
+        }
+        .complaints-list {
+            display: grid;
+            gap: 25px;
+        }
+        .complaint-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-left: 5px solid var(--accent-color);
+        }
+        .complaint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .complaint-header p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--secondary-text);
+        }
+        .complaint-header p strong {
+            color: var(--primary-text);
+            font-size: 16px;
+        }
+        .complaint-body {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 768px) {
+            .complaint-body {
+                grid-template-columns: 250px 1fr;
+            }
+        }
+        .complaint-media {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .complaint-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .complaint-audio {
+            width: 100%;
+        }
+        .complaint-description p {
+            font-size: 16px;
+            color: var(--primary-text);
+            line-height: 1.7;
+            margin: 0;
+            white-space: pre-wrap; /* Preserve line breaks */
+        }
+        .complaint-actions {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            text-align: right;
+        }
+        .btn-resolve {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+            color: white;
+            background-color: var(--success-color);
+        }
+        .btn-resolve:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        .btn-resolve:disabled {
+            background-color: #9ca3af; /* Warna kelabu */
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.7;
+        }
+        .no-complaints {
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <a href="(SARS)-Guru.html" class="btn-back" title="Kembali ke Papan Pemuka"><i class="fas fa-arrow-left"></i></a>
+            <h1>Senarai Aduan Pelajar</h1>
+        </div>
+        <div id="complaintsList" class="complaints-list">
+            <!-- Aduan akan dimasukkan di sini oleh JavaScript -->
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        // KONFIGURASI FIREBASE ANDA DI SINI
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHLLooeaf-Exl3USJCi7oSU7IaeEy81x4",
+            authDomain: "sars-sekolah-apps.firebaseapp.com",
+            projectId: "sars-sekolah-apps",
+            storageBucket: "sars-sekolah-apps.appspot.com",
+            messagingSenderId: "682320330957",
+            appId: "1:682320330957:web:c9c589f84cb0a98f472984",
+            measurementId: "G-9QGK3JT82V"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const complaintsList = document.getElementById('complaintsList');
+
+            // Dapatkan data pengguna yang sedang log masuk untuk mendapatkan kunci sekolah
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+
+            // Semak jika data pengguna wujud, jika tidak, paparkan ralat.
+            if (!currentUser || !currentUser.sekolah_key) {
+                complaintsList.innerHTML = `<div class="no-complaints"><p>Ralat: Sila log masuk semula untuk melihat aduan.</p></div>`;
+                return;
+            }
+
+            function renderComplaints(complaints) {
+                complaintsList.innerHTML = '';
+
+                if (complaints.length === 0) {
+                    complaintsList.innerHTML = `<div class="no-complaints"><p>Tiada aduan baru buat masa ini.</p></div>`;
+                    return;
+                }
+
+                complaints.forEach(complaint => {
+                    const submissionDate = new Date(complaint.submissionTimestamp).toLocaleString('ms-MY', {
+                        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    const audioPlayerHTML = complaint.audioSrc
+                        ? `<audio controls class="complaint-audio" src="${complaint.audioSrc}"></audio>`
+                        : '<p><small>Tiada rakaman suara.</small></p>';
+
+                    // Semak jika pengguna semasa adalah guru disiplin (berdasarkan nama)
+                    const isDisciplineTeacher = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('.disiplin');
+
+                    // Cipta butang berdasarkan kebenaran
+                    const actionButtonHTML = isDisciplineTeacher
+                        ? `<button class="btn-resolve">Tandakan Selesai</button>`
+                        : `<button class="btn-resolve" disabled title="Hanya guru disiplin boleh melakukan tindakan ini.">Tandakan Selesai</button>`;
+
+                    const cardHTML = `
+                        <div class="complaint-card" data-id="${complaint.id}">
+                            <div class="complaint-header">
+                                <p><strong>${complaint.studentName}</strong><br>(${complaint.studentSchool})</p>
+                                <p>${submissionDate}</p>
+                            </div>
+                            <div class="complaint-body">
+                                <div class="complaint-media">
+                                    ${complaint.imageSrc ? `<img src="${complaint.imageSrc}" alt="Bukti Aduan" class="complaint-image">` : '<p><small>Tiada gambar.</small></p>'}
+                                    ${audioPlayerHTML}
+                                </div>
+                                <div class="complaint-description">
+                                    <p>${complaint.description}</p>
+                                </div>
+                            </div>
+                            <div class="complaint-actions">
+                                ${actionButtonHTML}
+                            </div>
+                        </div>`;
+                    complaintsList.innerHTML += cardHTML;
+                });
+                addEventListenersToButtons();
+            }
+
+            function addEventListenersToButtons() {
+                document.querySelectorAll('.btn-resolve').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const card = this.closest('.complaint-card');
+                        const complaintId = card.dataset.id;
+                        
+                        // Kemas kini status di Firestore
+                        db.collection('complaints').doc(complaintId).update({
+                            status: 'resolved'
+                        }).catch(error => {
+                            console.error("Ralat mengemas kini status: ", error);
+                            alert("Gagal mengemas kini status aduan.");
+                        });
+                    });
+                });
+            }
+
+            // Dapatkan aduan secara real-time dari Firestore
+            db.collection('complaints')
+              .where('sekolah_key', '==', currentUser.sekolah_key)
+              .where('status', '==', 'new')
+              .orderBy('submissionTimestamp', 'desc')
+              .onSnapshot(querySnapshot => {
+                const complaints = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderComplaints(complaints);
+            }, error => {
+                console.error("Ralat mendapatkan aduan: ", error);
+                complaintsList.innerHTML = `<div class="no-complaints"><p>Gagal memuatkan data aduan.</p></div>`;
+            });
+        });
+    </script>
+
+</body>
+</html>

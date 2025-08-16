@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temujanji Kaunseling</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #e0f7fa;
+            --card-bg: #ffffff;
+            --primary-text: #004d40;
+            --secondary-text: #00796b;
+            --accent-color: #ff6f61;
+            --accent-hover: #e65a50;
+            --shadow-color: rgba(0, 77, 64, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-color);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: var(--primary-text);
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .lead {
+            color: var(--secondary-text);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary-text);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--secondary-text);
+        }
+
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #b2dfdb;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-text);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="date"]:focus,
+        input[type="time"]:focus {
+            outline: none;
+            border-color: var(--secondary-text);
+            box-shadow: 0 0 0 4px rgba(0, 121, 107, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            font-size: 22px;
+            color: var(--secondary-text);
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .btn-back:hover {
+            color: var(--primary-text);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="temujanjiForm">
+            <a href="(SARS)-PELAJAR.html" class="btn-back" title="Kembali ke Laman Utama">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1>Temujanji Kaunseling</h1>
+            <p class="lead">Sila pilih tarikh dan masa yang sesuai untuk sesi kaunseling anda.</p>
+            <div class="form-group">
+                <label for="tarikh"><i class="fas fa-calendar-alt"></i> Pilih Tarikh</label>
+                <input type="date" id="tarikh" required>
+            </div>
+            <div class="form-group">
+                <label for="masa"><i class="fas fa-clock"></i> Pilih Masa</label>
+                <input type="time" id="masa" required>
+            </div>
+            <button type="submit" id="hantar">Hantar Permohonan</button>
+        </form>
+    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        // KONFIGURASI FIREBASE ANDA DI SINI
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHLLooeaf-Exl3USJCi7oSU7IaeEy81x4",
+            authDomain: "sars-sekolah-apps.firebaseapp.com",
+            projectId: "sars-sekolah-apps",
+            storageBucket: "sars-sekolah-apps.appspot.com",
+            messagingSenderId: "682320330957",
+            appId: "1:682320330957:web:c9c589f84cb0a98f472984",
+            measurementId: "G-9QGK3JT82V"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+    <script>
+        document.getElementById('temujanjiForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const tarikh = document.getElementById('tarikh').value;
+            const masa = document.getElementById('masa').value;
+
+            if (!tarikh || !masa) {
+                alert('Sila pilih tarikh dan masa temujanji.');
+                return;
+            }
+
+            // Dapatkan data pengguna yang sedang log masuk
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+
+            // Semak jika pengguna telah log masuk
+            if (!currentUser || !currentUser.sekolah_key) {
+                alert("Ralat: Sila log masuk semula untuk memohon temujanji.");
+                window.location.href = 'index.html'; // Halakan ke laman log masuk
+                return;
+            }
+            const { nama: studentName, sekolah: studentSchool, sekolah_key } = currentUser;
+
+            // Cipta objek temujanji
+            const temujanjiBaru = {
+                studentName: studentName,
+                studentSchool: studentSchool,
+                sekolah_key: sekolah_key,
+                date: tarikh,
+                time: masa,
+                submissionTimestamp: new Date().toISOString(),
+                status: 'pending' // Status awal: menunggu pengesahan
+            };
+
+            // Simpan temujanji ke Firestore
+            db.collection('appointments').add(temujanjiBaru).then(() => {
+
+            // Tukar format masa ke 12-jam (AM/PM)
+            let [jam, minit] = masa.split(':');
+            const ampm = jam >= 12 ? 'PM' : 'AM';
+            jam = jam % 12 || 12; // Tukar 0 atau 24 ke 12
+            const masaFormatted = `${jam}:${minit} ${ampm}`;
+
+            alert(`Terima kasih, ${studentName} dari ${studentSchool}!\n\nPermohonan temujanji anda pada ${tarikh} jam ${masaFormatted} telah dihantar untuk pengesahan.`);
+
+            // Reset form
+            document.getElementById('temujanjiForm').reset();
+
+            }).catch((error) => {
+                console.error("Ralat menghantar permohonan: ", error);
+                alert("Gagal menghantar permohonan. Sila cuba lagi.");
+            });
+        });
+    </script>
+</body>
+</html>

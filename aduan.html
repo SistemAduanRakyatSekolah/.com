@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(SARS)-Aduan</title>
+    <!-- Font Awesome untuk ikon Telegram -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #003332;
+            --secondary-bg: #2cc295;
+            --secondary-bg-hover: #03625c;
+            --text-color: #ffffff;
+            --accent-color: #0088cc;
+            --accent-color-hover: #0077b5;
+            --danger-border: #ff3b30;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--primary-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 400px; /* Constrain width for better readability */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* Needed for the back button */
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        /* Hide the default file input */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Custom upload box styling */
+        .upload-box {
+            background: var(--secondary-bg);
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden; /* Ensures the preview image fits */
+            cursor: pointer;
+            color: var(--text-color);
+            text-align: center;
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .upload-box:hover {
+            background: var(--secondary-bg-hover);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Image preview styling */
+        #preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .form-group {
+            width: 100%;
+            max-width: 300px; /* Match upload box width */
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--danger-border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            background-color: #f0f0f0;
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 80px;
+        }
+
+        .form-group textarea::placeholder {
+            text-align: center;
+            color: #888;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.3);
+        }
+
+        /* Submit button styling */
+        .btn-hantar {
+            margin-top: 20px;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-hantar:hover {
+            background-color: var(--accent-color-hover);
+        }
+
+        /* Voice Recorder Styles */
+        .voice-recorder {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px; /* Match other elements */
+        }
+
+        .voice-recorder label {
+            text-align: center;
+            width: 100%;
+        }
+
+        .skrip-suara {
+            font-size: 13px;
+            color: var(--text-color);
+            opacity: 0.9;
+            text-align: center;
+            margin: 5px 0 15px 0;
+            line-height: 1.4;
+        }
+
+        .skrip-suara em {
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        .recorder-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-rekod {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+            width: 180px;
+            justify-content: center;
+        }
+
+        .btn-rekod:hover {
+            background-color: var(--secondary-bg-hover);
+        }
+
+        .btn-rekod.is-recording {
+            background-color: var(--danger-border);
+        }
+
+        #audioPlayback {
+            display: none; /* Hide by default */
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Back button style */
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: transform 0.2s, opacity 0.2s;
+            opacity: 0.8;
+        }
+
+        .btn-back:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <a href="(SARS)-PELAJAR.html" class="btn-back" title="Kembali ke Laman Utama">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2>Hantar Aduan</h2>
+        <form id="aduanForm" novalidate>
+            <label class="upload-box" for="imageUpload">
+                <span id="uploadText">Klik untuk muat naik bukti</span>
+                <img id="preview" alt="Preview Gambar">
+            </label>
+            <input type="file" id="imageUpload" accept="image/*" required>
+            
+            <div class="form-group">
+                <label for="penerangan">Penerangan</label>
+                <textarea id="penerangan" placeholder="Terangkan aduan anda di sini..." required></textarea>
+            </div>
+
+            <!-- Voice Recorder Section -->
+            <div class="form-group voice-recorder">
+                <label>Pengesahan Suara (Pilihan)</label>
+                <p class="skrip-suara">Sila sebut: <em>"Saya [Nama Penuh] dari [Nama Sekolah] mengesahkan aduan ini adalah sahih."</em></p>
+                <div class="recorder-controls">
+                    <button type="button" id="recordButton" class="btn-rekod">
+                        <i class="fas fa-microphone"></i>
+                        <span>Rakam Suara</span>
+                    </button>
+                    <audio id="audioPlayback" controls></audio>
+                </div>
+            </div>
+
+            <!-- Butang hantar dengan ikon Telegram -->
+            <button type="submit" class="btn-hantar">
+                <i class="fab fa-telegram-plane"></i> Hantar
+            </button>
+        </form>
+    </div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+    // KONFIGURASI FIREBASE ANDA DI SINI
+    const firebaseConfig = {
+        apiKey: "AIzaSyAHLLooeaf-Exl3USJCi7oSU7IaeEy81x4",
+        authDomain: "sars-sekolah-apps.firebaseapp.com",
+        projectId: "sars-sekolah-apps",
+        storageBucket: "sars-sekolah-apps.appspot.com",
+        messagingSenderId: "682320330957",
+        appId: "1:682320330957:web:c9c589f84cb0a98f472984",
+        measurementId: "G-9QGK3JT82V"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+<script>
+        const aduanForm = document.getElementById('aduanForm');
+        const imageUpload = document.getElementById('imageUpload');
+        const preview = document.getElementById('preview');
+        const uploadText = document.getElementById('uploadText');
+        const penerangan = document.getElementById('penerangan');
+
+        // Voice Recorder Elements
+        const recordButton = document.getElementById('recordButton');
+        const audioPlayback = document.getElementById('audioPlayback');
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordedAudioBlob = null;
+
+        // Set script text dynamically based on user data
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+            let nama = '[Nama Penuh Anda]';
+            let sekolah = '[Nama Sekolah Anda]';
+            if (currentUser) {
+                nama = currentUser.nama;
+                sekolah = currentUser.sekolah;
+            }
+            const skripElement = document.querySelector('.skrip-suara em');
+            if (skripElement) {
+                skripElement.textContent = `Saya ${nama} dari ${sekolah} mengesahkan aduan ini adalah sahih.`;
+            }
+        });
+
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    uploadText.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Voice Recorder Logic
+        recordButton.addEventListener('click', async () => {
+            if (isRecording) {
+                // Stop recording
+                mediaRecorder.stop();
+                recordButton.classList.remove('is-recording');
+                recordButton.querySelector('span').textContent = 'Rakam Semula';
+                recordButton.querySelector('i').classList.remove('fa-stop');
+                recordButton.querySelector('i').classList.add('fa-microphone');
+                isRecording = false;
+            } else {
+                // Start recording
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
+                    audioChunks = [];
+                    recordedAudioBlob = null;
+                    audioPlayback.style.display = 'none';
+                    audioPlayback.src = '';
+
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    mediaRecorder.onstop = () => {
+                        recordedAudioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(recordedAudioBlob);
+                        audioPlayback.src = audioUrl;
+                        audioPlayback.style.display = 'block';
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    mediaRecorder.start();
+                    
+                    recordButton.classList.add('is-recording');
+                    recordButton.querySelector('span').textContent = 'Berhenti Rakam';
+                    recordButton.querySelector('i').classList.remove('fa-microphone');
+                    recordButton.querySelector('i').classList.add('fa-stop');
+                    isRecording = true;
+                } catch (err) {
+                    console.error("Error accessing microphone:", err);
+                    alert("Tidak dapat mengakses mikrofon. Sila benarkan akses mikrofon dalam tetapan pelayar anda.");
+                }
+            }
+        });
+
+        aduanForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const file = imageUpload.files[0];
+            const description = penerangan.value.trim();
+
+            // PENAMBAHBAIKAN: Pastikan sekurang-kurangnya satu maklumat diisi
+            // (penerangan, gambar, atau rakaman suara).
+            if (!description && !file && !recordedAudioBlob) {
+                alert("Sila masukkan penerangan, atau muat naik gambar, atau buat rakaman suara untuk menghantar aduan.");
+                return;
+            }
+
+            // Dapatkan data pengguna yang sedang log masuk
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+            
+            // Semak jika pengguna telah log masuk
+            if (!currentUser || !currentUser.sekolah_key) {
+                alert("Ralat: Sila log masuk semula untuk menghantar aduan.");
+                window.location.href = 'index.html'; // Halakan ke laman log masuk
+                return;
+            }
+            const { nama: studentName, sekolah: studentSchool, sekolah_key } = currentUser;
+
+            const toBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+
+            let imageSrc = null;
+            if (file) {
+                imageSrc = await toBase64(file);
+            }
+
+            let audioSrc = null;
+            if (recordedAudioBlob) {
+                audioSrc = await toBase64(recordedAudioBlob);
+            }
+
+            const newComplaint = {
+                studentName: studentName,
+                studentSchool: studentSchool,
+                description: description,
+                imageSrc: imageSrc,
+                audioSrc: audioSrc,
+                submissionTimestamp: new Date().toISOString(),
+                status: 'new',
+                sekolah_key: sekolah_key // Kunci sekolah untuk query
+            };
+
+            // Simpan aduan ke Firestore
+            db.collection('complaints').add(newComplaint)
+                .then(() => {
+                    alert(`Aduan anda telah berjaya dihantar!`);
+                })
+                .catch((error) => {
+                    console.error("Ralat menghantar aduan: ", error);
+                    alert("Gagal menghantar aduan. Sila cuba lagi.");
+                });
+
+            
+            aduanForm.reset();
+            preview.style.display = 'none';
+            uploadText.style.display = 'block';
+            recordedAudioBlob = null;
+            audioChunks = [];
+            audioPlayback.style.display = 'none';
+            audioPlayback.src = '';
+            recordButton.classList.remove('is-recording');
+            recordButton.querySelector('span').textContent = 'Rakam Suara';
+            recordButton.querySelector('i').classList.remove('fa-stop');
+            recordButton.querySelector('i').classList.add('fa-microphone');
+            isRecording = false;
+        });
+    </script>
+</body>
+</html>

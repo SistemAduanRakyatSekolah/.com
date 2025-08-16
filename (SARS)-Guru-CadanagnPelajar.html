@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senarai Cadangan Pelajar</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-text: #1e293b;
+            --secondary-text: #475569;
+            --accent-color: #a4193d; /* Selaras dengan papan pemuka guru */
+            --shadow-color: rgba(100, 116, 139, 0.1);
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-color);
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+        .main-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn-back {
+            font-size: 24px;
+            color: var(--secondary-text);
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .btn-back:hover {
+            color: var(--primary-text);
+            transform: scale(1.1);
+        }
+        h1 {
+            color: var(--primary-text);
+            font-size: 28px;
+        }
+        .suggestions-list {
+            display: grid;
+            gap: 20px;
+        }
+        .suggestion-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-left: 5px solid var(--accent-color);
+        }
+        .suggestion-card p {
+            font-size: 16px;
+            color: var(--primary-text);
+            line-height: 1.6;
+            margin: 0 0 15px 0;
+        }
+        .suggestion-meta {
+            font-size: 13px;
+            color: var(--secondary-text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .no-suggestions {
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <a href="(SARS)-Guru.html" class="btn-back" title="Kembali ke Papan Pemuka"><i class="fas fa-arrow-left"></i></a>
+            <h1>Senarai Cadangan Pelajar</h1>
+        </div>
+        <div id="suggestionsList" class="suggestions-list">
+            <!-- Cadangan akan dimasukkan di sini oleh JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionsList = document.getElementById('suggestionsList');
+
+            // Dapatkan data pengguna yang sedang log masuk untuk mendapatkan kunci sekolah
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+
+            // Semak jika data pengguna wujud, jika tidak, paparkan ralat.
+            if (!currentUser || !currentUser.sekolah_key) {
+                suggestionsList.innerHTML = `<div class="no-suggestions"><p>Ralat: Sila log masuk semula untuk melihat cadangan.</p></div>`;
+                return;
+            }
+            const sekolah_key = currentUser.sekolah_key;
+            const storageKey = `sars_suggestions_${sekolah_key}`;
+            const suggestions = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+            if (suggestions.length === 0) {
+                suggestionsList.innerHTML = `<div class="no-suggestions"><p>Tiada cadangan baru buat masa ini.</p></div>`;
+            } else {
+                suggestions.reverse().forEach(suggestion => {
+                    const submissionDate = new Date(suggestion.date).toLocaleString('ms-MY', {
+                        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    const cardHTML = `
+                        <div class="suggestion-card">
+                            <p>${suggestion.text}</p>
+                            <div class="suggestion-meta">
+                                <span><strong>Daripada:</strong> ${suggestion.author} (${suggestion.school})</span>
+                                <span>${submissionDate}</span>
+                            </div>
+                        </div>`;
+                    suggestionsList.innerHTML += cardHTML;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

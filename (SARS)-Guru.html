@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(SARS)-Guru</title>
+    <!-- Memuatkan ikon dari Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Gaya Asas untuk keseluruhan halaman */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background-color: #ffdfb9;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ================== BAHAGIAN SIDEBAR ================== */
+        .sidebar {
+            height: 100vh;
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0; /* Sidebar sentiasa kelihatan */
+            background-color: #a4193d;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            transition: left 0.3s ease; /* Animasi buka/tutup */
+            z-index: 1001;
+        }
+        /* Butang untuk buka/tutup Sidebar pada skrin kecil */
+        .sidebar-toggle {
+            display: none; /* Sembunyi pada skrin besar */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            background: #a4193d;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
+        /* Bahagian Profil di dalam Sidebar */
+        .profile-container {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Gambar Profil */
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover; /* Memastikan gambar sentiasa muat */
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .profile-pic:hover {
+            opacity: 0.8;
+        }
+
+        /* Input untuk muat naik fail (tersembunyi) */
+        #profileUpload {
+            display: none;
+        }
+
+        /* Nama Pengguna */
+        #userName {
+            margin: 10px 0 0 0;
+            font-weight: 600;
+        }
+
+        /* Pautan Menu di Sidebar */
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        /* ================== BAHAGIAN UTAMA ================== */
+        /* Butang untuk buka/tutup Sidebar */
+
+        /* Kawasan Kandungan Utama */ 
+        .content {
+            padding: 20px;
+            margin-left: 220px; /* Anjakkan kandungan untuk beri ruang pada sidebar */
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Media Query untuk skrin kecil (telefon bimbit) */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px; /* Sembunyikan sidebar di luar skrin */
+            }
+            .sidebar.active {
+                left: 0; /* Tunjukkan sidebar apabila kelas 'active' ditambah */
+            }
+            .content {
+                margin-left: 0; /* Kandungan memenuhi skrin */
+            }
+            .sidebar-toggle {
+                display: block; /* Tunjukkan butang hamburger */
+            }
+        }
+
+        /* Keadaan Aktif untuk Sidebar dan Kandungan */
+
+        /* Bekas untuk kad-kad pilihan */
+        .pilihan-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding-top: 40px;
+            max-width: 1200px;
+        }
+
+        /* Gaya untuk setiap kad */
+        .card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 300px;
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .card a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .card-icon {
+            font-size: 60px;
+            color: #a4193d;
+            margin-bottom: 15px;
+        }
+        .card h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 10px 0;
+        }
+        .card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bahagian Sidebar (Menu Tepi) -->
+    <div class="sidebar" id="sidebar">
+        <div class="profile-container">
+            <label for="profileUpload">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" alt="Gambar Profil" class="profile-pic" id="profilePic">
+            </label>
+            <input type="file" id="profileUpload" accept="image/*">
+            <h3 id="userName">Nama Guru</h3>
+        </div>
+        <a href="#"><i class="fas fa-building-columns fa-fw"></i> Informasi Sekolah</a>
+        <a href="#"><i class="fas fa-chalkboard-user fa-fw"></i> Informasi Kelas</a>
+    </div>
+
+    <!-- Bahagian Kandungan Utama -->
+    <div class="content" id="content">
+        <!-- Butang Hamburger untuk Skrin Kecil -->
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+        <div class="pilihan-container">
+            <div class="card">
+                <a href="(SARS)-Guru-Aduan.html">
+                    <i class="fas fa-envelope-open-text card-icon"></i>
+                    <h1>Peti Masuk Aduan</h1>
+                    <p>Lihat dan uruskan semua aduan yang diterima daripada pelajar.</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="(SARS)-Guru-Kaunseling.html">
+                    <i class="fas fa-calendar-check card-icon"></i>
+                    <h1>Jadual Kaunseling</h1>
+                    <p>Semak dan sahkan permohonan temujanji kaunseling daripada pelajar.</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="(SARS)-Guru-CadanagnPelajar.html">
+                    <i class="fas fa-lightbulb card-icon"></i>
+                    <h1>Cadangan Pelajar</h1>
+                    <p>Baca cadangan dan idea penambahbaikan yang dihantar oleh pelajar.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import perkhidmatan Firebase yang diperlukan
+        import { storage } from './firebase-client.js';
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePic = document.getElementById('profilePic');
+            const profileUpload = document.getElementById('profileUpload');
+            const userNameElement = document.getElementById('userName');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+            if (currentUser) {
+                userNameElement.textContent = currentUser.nama;
+                setupProfilePicture(currentUser);
+            } else {
+                window.location.href = 'index.html';
+            }
+
+            // Fungsi untuk mengurus gambar profil dengan Firebase Storage
+            function setupProfilePicture(user) {
+                // 1. Paparkan gambar sedia ada dari URL dalam profil pengguna
+                if (user.profilePicUrl) {
+                    profilePic.src = user.profilePicUrl;
+                }
+
+                // 2. Apabila fail baharu dipilih untuk dimuat naik
+                profileUpload.addEventListener('change', async function() {
+                    const file = this.files[0];
+                    if (file) {
+                        // Tunjukkan penunjuk memuat naik (contoh: tukar border)
+                        profilePic.style.border = '3px solid #f59e0b'; // Warna oren
+
+                        try {
+                            // Cipta rujukan unik dalam Firebase Storage
+                            const storageRef = ref(storage, `profile_pictures/${user.uid}/${file.name}`);
+
+                            // Muat naik fail
+                            const snapshot = await uploadBytes(storageRef, file);
+
+                            // Dapatkan URL muat turun
+                            const downloadURL = await getDownloadURL(snapshot.ref);
+
+                            // Kemas kini URL dalam pangkalan data melalui backend
+                            await fetch('http://localhost:3000/update-profile-picture', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ uid: user.uid, url: downloadURL })
+                            });
+
+                            // Kemas kini gambar pada halaman dan dalam localStorage
+                            profilePic.src = downloadURL;
+                            user.profilePicUrl = downloadURL;
+                            localStorage.setItem('sars_currentUser', JSON.stringify(user));
+
+                        } catch (error) {
+                            console.error("Ralat memuat naik gambar:", error);
+                            alert("Gagal memuat naik gambar profil.");
+                        } finally {
+                            // Kembalikan border kepada keadaan asal
+                            profilePic.style.border = '3px solid white';
+                        }
+                    }
+                });
+            }
+
+            // Fungsi untuk toggle sidebar pada skrin kecil
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

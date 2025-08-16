@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(SARS)-Pelajar</title>
+
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background-color: #ffdfb9;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Status Container Styling */
+        .status-container {
+            width: 100%;
+            max-width: 960px;
+            margin-bottom: 30px;
+        }
+        .status-container h2 {
+            color: #a4193d;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffb9b3;
+        }
+        .status-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .status-card i {
+            font-size: 28px;
+            color: #a4193d;
+            width: 40px;
+            text-align: center;
+        }
+        .status-details {
+            flex-grow: 1;
+        }
+        .status-details p {
+            margin: 0;
+            color: #333;
+        }
+        .status-label {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: white;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .status-label.pending {
+            background-color: #f59e0b; /* Amber */
+        }
+        .status-label.confirmed {
+            background-color: #22c55e; /* Green */
+        }
+
+        /* Butang Hamburger */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            background: #a4193d;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1002;
+            transition: left 0.3s ease;
+        }
+
+
+        /* Sidebar styling */
+        .sidebar {
+            height: 100vh;
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0; /* sentiasa kelihatan */
+            background-color: #a4193d;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            transition: left 0.3s ease; /* Animasi untuk buka/tutup */
+            z-index: 1001;
+        }
+
+        .profile-container {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .profile-pic:hover {
+            opacity: 0.8;
+        }
+
+        #profileUpload {
+            display: none;
+        }
+
+        #userName {
+            margin: 10px 0 0 0;
+            font-weight: 600;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        /*umtuk hitam2 bila sidebar dipilih*/
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        /* Content area */
+        .content {
+            padding: 20px;
+            margin-left: 220px; /* Anjakkan kandungan untuk beri ruang pada sidebar */
+            width: 100%;
+            display: block; /* Ubah dari flex ke block */
+            justify-content: center;
+            transition: margin-left 0.3s ease;
+
+        }
+        
+        /* Media Query untuk skrin kecil (telefon bimbit) */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px; /* Sembunyikan sidebar */
+            }
+            .sidebar.active {
+                left: 0; /* Tunjukkan sidebar */
+            }
+            .content {
+                margin-left: 0; /* Kandungan penuhi skrin */
+            }
+            .sidebar-toggle {
+                display: block; /* Tunjukkan butang hamburger */
+            }
+        }
+
+        .pilihan-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+            justify-content: center;
+            gap: 30px;
+            padding-top: 40px;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 300px;
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card-icon {
+            font-size: 60px;
+            color: #a4193d;
+            margin-bottom: 15px;
+        }
+
+        .card h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="profile-container">
+            <label for="profileUpload">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" alt="Gambar Profil" class="profile-pic" id="profilePic">
+            </label>
+            <input type="file" id="profileUpload" accept="image/*">
+            <h3 id="userName">Nama Pengguna</h3>
+        </div>
+        <a href="#"><i class="fas fa-building-columns fa-fw"></i> Informasi Sekolah</a>
+        <a href="#"><i class="fas fa-chalkboard-user fa-fw"></i> Informasi Kelas</a>
+    </div>
+    <!-- Butang Hamburger untuk Skrin Kecil -->
+    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+    <!-- Content -->
+    <div class="content" id="content">
+        <!-- Bahagian Status Terkini akan ditambah di sini oleh JS -->
+        <div id="statusContainer" class="status-container"></div>
+
+        <div class="pilihan-container">
+            <div class="card">
+                <a href="aduan.html">
+                    <i class="fas fa-bullhorn card-icon"></i>
+                    <h1>Aduan</h1>
+                    <p>Laporkan sebarang insiden atau masalah dengan selamat dan sulit. Suara anda penting untuk tindakan kami.</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="kaunseling.html">
+                    <i class="fas fa-hand-holding-heart card-icon"></i>
+                    <h1>Kaunseling</h1>
+                    <p>Perlukan sokongan atau seseorang untuk berbual? Jadualkan sesi sulit bersama kaunselor sekolah anda.</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="(SARS)-Cadangan Pelajar.html">
+                    <i class="fas fa-lightbulb card-icon"></i>
+                    <h1>Cadangan</h1>
+                    <p>Ada idea hebat untuk menambah baik sekolah? Kongsikan cadangan membina anda untuk manfaat bersama.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import perkhidmatan Firebase yang diperlukan
+        import { db, storage } from './firebase-client.js';
+        import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePic = document.getElementById('profilePic');
+            const profileUpload = document.getElementById('profileUpload');
+            const userNameElement = document.getElementById('userName');
+            const statusContainer = document.getElementById('statusContainer');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+            if (currentUser) {
+                userNameElement.textContent = currentUser.nama;
+                setupProfilePicture(currentUser);
+                loadUserStatuses(currentUser); // Muatkan status pengguna
+            } else {
+                window.location.href = 'index.html';
+            }
+
+            // Fungsi untuk mengurus gambar profil dengan Firebase Storage
+            function setupProfilePicture(user) {
+                // 1. Paparkan gambar sedia ada dari URL dalam profil pengguna
+                if (user.profilePicUrl) {
+                    profilePic.src = user.profilePicUrl;
+                }
+
+                // 2. Apabila fail baharu dipilih untuk dimuat naik
+                profileUpload.addEventListener('change', async function() {
+                    const file = this.files[0];
+                    if (file) {
+                        // Tunjukkan penunjuk memuat naik (contoh: tukar border)
+                        profilePic.style.border = '3px solid #f59e0b'; // Warna oren
+
+                        try {
+                            // Cipta rujukan unik dalam Firebase Storage
+                            const storageRef = ref(storage, `profile_pictures/${user.uid}/${file.name}`);
+
+                            // Muat naik fail
+                            const snapshot = await uploadBytes(storageRef, file);
+
+                            // Dapatkan URL muat turun
+                            const downloadURL = await getDownloadURL(snapshot.ref);
+
+                            // Kemas kini URL dalam pangkalan data melalui backend
+                            await fetch('http://localhost:3000/update-profile-picture', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ uid: user.uid, url: downloadURL })
+                            });
+
+                            // Kemas kini gambar pada halaman dan dalam localStorage
+                            profilePic.src = downloadURL;
+                            user.profilePicUrl = downloadURL;
+                            localStorage.setItem('sars_currentUser', JSON.stringify(user));
+
+                        } catch (error) {
+                            console.error("Ralat memuat naik gambar:", error);
+                            alert("Gagal memuat naik gambar profil.");
+                        } finally {
+                            // Kembalikan border kepada keadaan asal
+                            profilePic.style.border = '3px solid white';
+                        }
+                    }
+                });
+            }
+
+            // Fungsi untuk memuatkan dan memaparkan status dari Firestore
+            function loadUserStatuses(user) {
+                const { uid } = user;
+
+                // 1. Dapatkan Status Temujanji Kaunseling secara real-time
+                const appointmentsQuery = query(
+                    collection(db, "appointments"),
+                    where("student_uid", "==", uid),
+                    where("status", "in", ["pending", "confirmed"])
+                );
+
+                // 2. Dapatkan Status Aduan secara real-time
+                const complaintsQuery = query(
+                    collection(db, "complaints"),
+                    where("student_uid", "==", uid),
+                    where("status", "==", "new")
+                );
+
+                // Gabungkan listener untuk kedua-dua query
+                let appointmentsData = [];
+                let complaintsData = [];
+
+                const renderAllStatuses = () => {
+                    let statusHTML = '';
+                    const hasStatus = appointmentsData.length > 0 || complaintsData.length > 0;
+
+                    if (hasStatus) {
+                        statusHTML += `<h2>Status Terkini</h2>`;
+                    }
+
+                    // Paparkan status temujanji
+                    appointmentsData.forEach(app => {
+                        let statusText = '';
+                        let statusClass = '';
+                        if (app.status === 'pending') {
+                            statusText = 'Menunggu Pengesahan';
+                            statusClass = 'pending';
+                        } else if (app.status === 'confirmed') {
+                            statusText = 'Telah Disahkan';
+                            statusClass = 'confirmed';
+                        }
+                        if (statusText) {
+                            const appDate = new Date(app.date).toLocaleDateString('ms-MY');
+                            statusHTML += `
+                                <div class="status-card">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                    <div class="status-details">
+                                        <p><strong>Temujanji Kaunseling</strong> (${appDate})</p>
+                                        <p class="status-label ${statusClass}">${statusText}</p>
+                                    </div>
+                                </div>`;
+                        }
+                    });
+
+                    // Paparkan status aduan
+                    complaintsData.forEach(complaint => {
+                        statusHTML += `
+                            <div class="status-card"><i class="fas fa-bullhorn"></i><div class="status-details"><p><strong>Aduan</strong></p><p class="status-label pending">Telah Diterima</p></div></div>`;
+                    });
+
+                    statusContainer.innerHTML = statusHTML;
+                };
+
+                onSnapshot(appointmentsQuery, (snapshot) => {
+                    appointmentsData = snapshot.docs.map(doc => doc.data());
+                    renderAllStatuses();
+                });
+
+                onSnapshot(complaintsQuery, (snapshot) => {
+                    complaintsData = snapshot.docs.map(doc => doc.data());
+                    renderAllStatuses();
+                });
+            }
+
+            // Fungsi untuk toggle sidebar pada skrin kecil
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

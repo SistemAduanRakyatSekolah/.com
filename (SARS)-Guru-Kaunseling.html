@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadual Temujanji Kaunseling</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-text: #1e293b;
+            --secondary-text: #475569;
+            --accent-color: #a4193d; /* Selaras dengan papan pemuka guru */
+            --shadow-color: rgba(100, 116, 139, 0.1);
+            --border-color: #e2e8f0;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-color);
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+        .main-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn-back {
+            font-size: 24px;
+            color: var(--secondary-text);
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .btn-back:hover {
+            color: var(--primary-text);
+            transform: scale(1.1);
+        }
+        h1 {
+            color: var(--primary-text);
+            font-size: 28px;
+        }
+        .appointments-list {
+            display: grid;
+            gap: 20px;
+        }
+        .appointment-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-left: 5px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .appointment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .appointment-details p {
+            margin: 0;
+            font-size: 16px;
+            color: var(--primary-text);
+        }
+        .appointment-details p strong {
+            color: var(--secondary-text);
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+        .btn-action {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+            color: white;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        .btn-confirm {
+            background-color: var(--success-color);
+        }
+        .btn-reject {
+            background-color: var(--danger-color);
+        }
+        .btn-action:disabled {
+            background-color: #9ca3af; /* Warna kelabu */
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.7;
+        }
+        .no-appointments {
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <a href="(SARS)-Guru.html" class="btn-back" title="Kembali ke Papan Pemuka"><i class="fas fa-arrow-left"></i></a>
+            <h1>Permohonan Temujanji Kaunseling</h1>
+        </div>
+        <div id="appointmentsList" class="appointments-list">
+            <!-- Permohonan temujanji akan dimasukkan di sini oleh JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const appointmentsList = document.getElementById('appointmentsList');
+            
+            // Dapatkan data pengguna yang sedang log masuk untuk mendapatkan kunci sekolah
+            const currentUser = JSON.parse(localStorage.getItem('sars_currentUser'));
+
+            // Semak jika data pengguna wujud, jika tidak, paparkan ralat.
+            if (!currentUser || !currentUser.sekolah_key) {
+                appointmentsList.innerHTML = `<div class="no-appointments"><p>Ralat: Sila log masuk semula untuk melihat permohonan.</p></div>`;
+                return;
+            }
+            const storageKey = `sars_appointments_${currentUser.sekolah_key}`;
+            let allAppointments = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+            function renderAppointments() {
+                // Kosongkan senarai dahulu untuk memaparkan data terkini
+                appointmentsList.innerHTML = '';
+
+                // Tapis untuk tunjukkan permohonan yang masih 'pending' (menunggu)
+                const pendingAppointments = allAppointments.filter(app => app.status === 'pending');
+
+                // Susun permohonan, yang terbaru di atas
+                pendingAppointments.sort((a, b) => new Date(b.submissionTimestamp) - new Date(a.submissionTimestamp));
+
+                if (pendingAppointments.length === 0) {
+                    appointmentsList.innerHTML = `<div class="no-appointments"><p>Tiada permohonan temujanji baru buat masa ini.</p></div>`;
+                } else {
+                    pendingAppointments.forEach(appointment => {
+                        // Cari indeks asal dalam array 'allAppointments' untuk kemas kini status nanti
+                        const originalIndex = allAppointments.findIndex(item => item.submissionTimestamp === appointment.submissionTimestamp);
+
+                        // Format tarikh dan masa untuk paparan
+                        const appointmentDate = new Date(appointment.date).toLocaleDateString('ms-MY', {
+                            day: '2-digit', month: 'long', year: 'numeric'
+                        });
+                        let [hour, minute] = appointment.time.split(':');
+                        const ampm = hour >= 12 ? 'PM' : 'AM';
+                        hour = hour % 12 || 12;
+                        const appointmentTime = `${hour}:${minute} ${ampm}`;
+
+                        // Semak jika pengguna semasa adalah guru kaunseling (berdasarkan nama)
+                        const isCounselingTeacher = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('.kaunseling');
+
+                        // Cipta butang berdasarkan kebenaran
+                        const actionButtonsHTML = isCounselingTeacher
+                            ? `<button class="btn-action btn-confirm" data-action="confirm">Sahkan</button>
+                               <button class="btn-action btn-reject" data-action="reject">Tolak</button>`
+                            : `<button class="btn-action btn-confirm" disabled title="Hanya guru kaunseling boleh melakukan tindakan ini.">Sahkan</button>
+                               <button class="btn-action btn-reject" disabled title="Hanya guru kaunseling boleh melakukan tindakan ini.">Tolak</button>`;
+                        const cardHTML = `
+                            <div class="appointment-card" data-index="${originalIndex}">
+                                <div class="appointment-details">
+                                    <p><strong>Pelajar:</strong> ${appointment.studentName}</p>
+                                    <p><strong>Sekolah:</strong> ${appointment.studentSchool}</p>
+                                    <p><strong>Tarikh Dicadang:</strong> ${appointmentDate}</p>
+                                    <p><strong>Masa Dicadang:</strong> ${appointmentTime}</p>
+                                </div>
+                                <div class="appointment-actions">
+                                    ${actionButtonsHTML}
+                                </div>
+                            </div>`;
+                        appointmentsList.innerHTML += cardHTML;
+                    });
+                }
+                // Tambah fungsi 'event listener' pada butang yang baru dicipta
+                addEventListenersToButtons();
+            }
+
+            function addEventListenersToButtons() {
+                document.querySelectorAll('.btn-action').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const card = this.closest('.appointment-card');
+                        const index = parseInt(card.dataset.index);
+                        const action = this.dataset.action;
+
+                        // Kemas kini status berdasarkan butang yang ditekan
+                        allAppointments[index].status = (action === 'confirm') ? 'confirmed' : 'rejected';
+
+                        // Simpan senarai yang telah dikemas kini ke localStorage
+                        localStorage.setItem(storageKey, JSON.stringify(allAppointments));
+
+                        // Paparkan semula senarai untuk membuang kad yang telah diuruskan
+                        renderAppointments();
+                    });
+                });
+            }
+
+            // Tambah 'listener' untuk mengemas kini senarai secara automatik
+            // jika ada perubahan dalam tab/tetingkap lain.
+            window.addEventListener('storage', function(e) {
+                if (e.key === storageKey) {
+                    // Muatkan semula data dari localStorage dan paparkan semula senarai
+                    allAppointments = JSON.parse(localStorage.getItem(storageKey)) || [];
+                    renderAppointments();
+                }
+            });
+
+            // Paparan awal semasa halaman dimuatkan
+            renderAppointments();
+        });
+    </script>
+</body>
+</html>

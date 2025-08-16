@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Datang Ke SARS</title>
+    <!-- Pautan CDN Font Awesome yang betul -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Pautan ke stylesheet luaran -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tajuk utama halaman -->
+    <h1 class="main-title">SELAMAT DATANG KE SARS</h1>
+
+    <div class="container" id="container">
+        <!-- Borang Pendaftaran -->
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Cipta Akaun</h1>
+                <div class="input-group">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <select name="peranan" required>
+                        <option value="" disabled selected>Pilih Peranan</option>
+                        <option value="guru">Guru</option>
+                        <option value="pelajar">Pelajar</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" name="nama" placeholder="Nama Anda" required />
+                </div>
+                 <div class="input-group">
+                    <i class="fa-solid fa-school"></i>
+                    <input type="text" name="sekolah" placeholder="Nama Sekolah" required />
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email" required />
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" placeholder="Kata Laluan" required />
+                </div>
+                <p class="form-message"></p>
+                <button type="submit">Daftar</button>
+            </form>
+        </div>
+        <!-- Borang Log Masuk -->
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Log Masuk</h1>
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email" required />
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" placeholder="Kata Laluan" required />
+                </div>
+                <a href="#" class="forgot-password">Lupa kata laluan anda?</a>
+                <p class="form-message"></p>
+                <button type="submit">Log Masuk</button>
+            </form>
+        </div>
+        <!-- Panel Tindanan (Overlay) -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Selamat Kembali!</h1>
+                    <p>Untuk terus berhubung dengan kami, sila log masuk dengan maklumat peribadi anda</p>
+                    <button class="ghost" id="signIn">Log Masuk</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Kawan!</h1>
+                    <p>Masukkan butiran peribadi anda dan mulakan perjalanan dengan kami</p>
+                    <button class="ghost" id="signUp">Daftar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Pautkan fail JavaScript sebelum penutup body -->
+    <script type="module" src="function.js"></script>
+</body>
+</html>
